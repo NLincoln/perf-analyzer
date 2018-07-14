@@ -8,6 +8,12 @@ import { executeRequests } from "./executeRequests";
 import { CircularProgress } from "@material-ui/core";
 import StatusCode from "./components/StatusCode";
 import HeadersInput from "./HeadersInput";
+import {
+  VictoryChart,
+  VictoryBoxPlot,
+  VictoryTheme,
+  VictoryAxis
+} from "victory";
 
 // https://coolors.co/4a4238-4d5359-508484-79c99e-97db4f
 
@@ -122,35 +128,43 @@ class App extends Component {
   }
 
   pressGo = () => {
-    if (this.request$) {
-      this.request$.unsubscribe();
-    }
     this.setState({
-      results: [],
       state: States.warming
     });
     /**
      * Execute warming requests
      */
-    this.request$ = executeRequests({
+    executeRequests({
       url: this.state.form.url,
       samples: this.state.form.warmups,
       headers: this.getHeaders()
     }).subscribe({
       complete: () => {
-        this.setState({
-          state: States.running
-        });
-        this.request$ = executeRequests({
+        this.setState(prevState => ({
+          state: States.running,
+          results: prevState.results.concat([[]])
+        }));
+        executeRequests({
           url: this.state.form.url,
           samples: this.state.form.samples,
           headers: this.getHeaders()
-        }).subscribe(result => {
-          this.setState(prevState => {
-            return {
-              results: [...prevState.results, result]
-            };
-          });
+        }).subscribe({
+          next: result => {
+            this.setState(prevState => {
+              let prevResults = prevState.results.slice(0, -1);
+              let currentResults = prevState.results[
+                prevState.results.length - 1
+              ].concat(result);
+              return {
+                results: [...prevResults, currentResults]
+              };
+            });
+          },
+          complete: () => {
+            this.setState({
+              state: States.waiting
+            });
+          }
         });
       }
     });
@@ -209,6 +223,7 @@ class App extends Component {
                 </GridArea>
                 <GridArea grid-area={"go"}>
                   <GoButton
+                    disabled={this.state.state !== States.waiting}
                     variant={"contained"}
                     color={"primary"}
                     onClick={this.pressGo}
@@ -229,17 +244,42 @@ class App extends Component {
           )}
           {this.state.results.length > 0 && (
             <Card>
-              <CardHeader>Results</CardHeader>
+              <CardHeader> Results </CardHeader>
+              <CardContent>
+                <VictoryChart
+                  theme={VictoryTheme.material}
+                  domainPadding={20}
+                  name={this.state.form.url}
+                >
+                  <VictoryAxis dependentAxis />
+                  <VictoryBoxPlot
+                    boxWidth={20}
+                    data={this.state.results
+                      .filter(resultset => resultset.length > 0)
+                      .map((resultset, i) => ({
+                        x: i + 1,
+                        y: resultset.map(result => result.time)
+                      }))}
+                  />
+                </VictoryChart>
+              </CardContent>
+            </Card>
+          )}
+          {this.state.results.length > 0 && (
+            <Card>
+              <CardHeader>Raw Results</CardHeader>
               <CardContent>
                 <ResultList>
-                  {this.state.results.map(result => {
-                    return (
-                      <Result key={result.run}>
-                        {result.run}: {result.time.toFixed(2)} ms{" "}
-                        <StatusCode code={result.response.status} />
-                      </Result>
-                    );
-                  })}
+                  {this.state.results[this.state.results.length - 1].map(
+                    result => {
+                      return (
+                        <Result key={result.run}>
+                          {result.run}: {result.time.toFixed(2)} ms{" "}
+                          <StatusCode code={result.response.status} />
+                        </Result>
+                      );
+                    }
+                  )}
                 </ResultList>
               </CardContent>
             </Card>
