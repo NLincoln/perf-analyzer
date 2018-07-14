@@ -107,7 +107,7 @@ class App extends Component {
   }
 
   onChange = event => {
-    this.this.setFormState({
+    this.setFormState({
       [event.target.name]: event.target.value
     });
   };
