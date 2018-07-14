@@ -6,6 +6,7 @@ import { FormGroup, FormLabel, FormInput } from "./components/Form";
 import Button from "@material-ui/core/Button";
 import { executeRequests } from "./executeRequests";
 import { CircularProgress } from "@material-ui/core";
+import StatusCode from "./components/StatusCode";
 
 // https://coolors.co/4a4238-4d5359-508484-79c99e-97db4f
 
@@ -163,7 +164,8 @@ class App extends Component {
                   {this.state.results.map(result => {
                     return (
                       <Result key={result.run}>
-                        {result.run}: {result.time.toFixed(2)} ms
+                        {result.run}: {result.time.toFixed(2)} ms{" "}
+                        <StatusCode code={result.response.status} />
                       </Result>
                     );
                   })}

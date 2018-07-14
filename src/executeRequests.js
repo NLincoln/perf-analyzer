@@ -3,9 +3,10 @@ import { each } from "bluebird";
 
 function run({ url }) {
   let start = performance.now();
-  return fetch(url).then(() => {
+  return fetch(url).then(response => {
     let end = performance.now();
     return {
+      response,
       time: end - start
     };
   });
