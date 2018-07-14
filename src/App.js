@@ -7,6 +7,7 @@ import Button from "@material-ui/core/Button";
 import { executeRequests } from "./executeRequests";
 import { CircularProgress } from "@material-ui/core";
 import StatusCode from "./components/StatusCode";
+import HeadersInput from "./HeadersInput";
 
 // https://coolors.co/4a4238-4d5359-508484-79c99e-97db4f
 
@@ -22,6 +23,7 @@ const UrlForm = styled.div`
   grid-template-areas:
     "url url"
     "warmup samples"
+    "headers headers"
     "go go";
 `;
 
@@ -47,20 +49,77 @@ const States = {
   running: "running"
 };
 
+const persistence = {
+  persistState(state) {
+    localStorage.setItem("perf-analyzer:state", JSON.stringify(state));
+  },
+  hydrateState() {
+    let defaultState = {
+      url: "http://localhost/api/auth/v1/versions",
+      warmups: 10,
+      samples: 25,
+      headers: [
+        {
+          key: "Authorization",
+          value: "Bearer "
+        },
+        {
+          key: "",
+          value: ""
+        }
+      ]
+    };
+    let storage = localStorage.getItem("perf-analyzer:state");
+    if (storage === null) {
+      return defaultState;
+    }
+    return {
+      ...defaultState,
+      ...JSON.parse(storage)
+    };
+  }
+};
+
 class App extends Component {
   state = {
-    url: "http://localhost/api/auth/v1/versions",
-    warmups: 10,
-    samples: 25,
     results: [],
-    state: States.waiting
+    state: States.waiting,
+    form: persistence.hydrateState()
   };
 
+  setFormState(updater, onFinish) {
+    this.setState(
+      prevState => {
+        let nextState =
+          typeof updater === "function" ? updater(prevState.form) : updater;
+        return {
+          form: {
+            ...prevState.form,
+            ...nextState
+          }
+        };
+      },
+      () => {
+        persistence.persistState(this.state.form);
+        onFinish && onFinish();
+      }
+    );
+  }
+
   onChange = event => {
-    this.setState({
+    this.this.setFormState({
       [event.target.name]: event.target.value
     });
   };
+
+  getHeaders() {
+    return this.state.form.headers
+      .filter(header => header.key !== "" && header.value !== "")
+      .reduce((prev, curr) => {
+        prev[curr.key] = curr.value;
+        return prev;
+      }, {});
+  }
 
   pressGo = () => {
     if (this.request$) {
@@ -74,16 +133,18 @@ class App extends Component {
      * Execute warming requests
      */
     this.request$ = executeRequests({
-      url: this.state.url,
-      samples: this.state.warmups
+      url: this.state.form.url,
+      samples: this.state.form.warmups,
+      headers: this.getHeaders()
     }).subscribe({
       complete: () => {
         this.setState({
           state: States.running
         });
         this.request$ = executeRequests({
-          url: this.state.url,
-          samples: this.state.samples
+          url: this.state.form.url,
+          samples: this.state.form.samples,
+          headers: this.getHeaders()
         }).subscribe(result => {
           this.setState(prevState => {
             return {
@@ -109,7 +170,7 @@ class App extends Component {
                     <FormInput
                       name={"url"}
                       placeholder={"http://localhost/path"}
-                      value={this.state.url}
+                      value={this.state.form.url}
                       onChange={this.onChange}
                     />
                   </FormGroup>
@@ -120,7 +181,7 @@ class App extends Component {
                     <FormInput
                       name={"warmups"}
                       type={"number"}
-                      value={this.state.warmups}
+                      value={this.state.form.warmups}
                       onChange={this.onChange}
                     />
                   </FormGroup>
@@ -131,10 +192,20 @@ class App extends Component {
                     <FormInput
                       name={"samples"}
                       type={"number"}
-                      value={this.state.samples}
+                      value={this.state.form.samples}
                       onChange={this.onChange}
                     />
                   </FormGroup>
+                </GridArea>
+                <GridArea grid-area={"headers"}>
+                  <HeadersInput
+                    value={this.state.form.headers}
+                    onChange={headers =>
+                      this.setFormState({
+                        headers: headers
+                      })
+                    }
+                  />
                 </GridArea>
                 <GridArea grid-area={"go"}>
                   <GoButton
