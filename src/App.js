@@ -245,7 +245,7 @@ class App extends Component {
           {this.state.results.length > 0 && (
             <Card>
               <CardHeader> Results </CardHeader>
-              <CardContent>
+              <CardContent noPadding>
                 <VictoryChart
                   theme={VictoryTheme.material}
                   domainPadding={20}

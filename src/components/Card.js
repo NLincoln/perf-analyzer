@@ -15,10 +15,14 @@ export const CardHeader = styled.div`
 `;
 
 export const CardContent = styled.div`
-  padding: 24px;
   background-color: white;
   color: #222;
 
+  ${props =>
+    !props.noPadding &&
+    css`
+      padding: 24px;
+    `};
   ${props =>
     props.centered &&
     css`
