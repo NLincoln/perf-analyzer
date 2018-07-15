@@ -62,7 +62,7 @@ const persistence = {
   },
   hydrateState() {
     let defaultState = {
-      url: "/api/auth/v1/versions",
+      url: "http://httpbin.org/headers",
       name: "",
       warmups: 10,
       samples: 25,
