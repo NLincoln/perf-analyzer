@@ -265,7 +265,9 @@ class App extends Component {
                     domainPadding={20}
                     name={this.state.form.url}
                     categories={{
-                      x: this.state.results.map(result => result.name)
+                      x: this.state.results.map(
+                        (result, i) => `${i + 1}: ${result.name}`
+                      )
                     }}
                   >
                     <VictoryBoxPlot
