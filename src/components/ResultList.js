@@ -1,6 +1,6 @@
 import React from "react";
 import styled from "styled-components";
-import { scaleQuantize } from "d3-scale";
+import { scaleQuantile } from "d3-scale";
 import StatusCode from "./StatusCode";
 
 let scale = [
@@ -16,7 +16,7 @@ let scale = [
   "#006837"
 ].reverse();
 
-let colorScale = scaleQuantize().range(scale);
+let colorScale = scaleQuantile().range(scale);
 
 const List = styled.ul`
   list-style: none;

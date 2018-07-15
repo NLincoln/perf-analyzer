@@ -44,6 +44,10 @@ const GridArea = styled.div`
 
 const GoButton = styled(Button)`
   width: 100%;
+  background-color: #508484;
+  &:hover {
+    background-color: #508484;
+  }
 `;
 
 const States = {
