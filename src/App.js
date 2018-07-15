@@ -62,7 +62,7 @@ const persistence = {
   },
   hydrateState() {
     let defaultState = {
-      url: "http://httpbin.org/headers",
+      url: "https://httpbin.org/headers",
       name: "",
       warmups: 10,
       samples: 25,
