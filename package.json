@@ -17,6 +17,7 @@
     "typeface-source-code-pro": "^0.0.54",
     "victory": "^0.27.2"
   },
+  "proxy": "http://localhost",
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",

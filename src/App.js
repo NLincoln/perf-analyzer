@@ -71,7 +71,7 @@ const persistence = {
   },
   hydrateState() {
     let defaultState = {
-      url: "http://localhost/api/auth/v1/versions",
+      url: "/api/auth/v1/versions",
       name: "",
       warmups: 10,
       samples: 25,
