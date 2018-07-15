@@ -16,9 +16,7 @@ const Wrapper = styled.div`
   min-width: 80vw;
   display: grid;
   grid-gap: 15px;
-  grid-template-areas:
-    "form form raw-results"
-    "chart chart raw-results";
+  grid-template-areas: "raw-results form chart";
   @media (max-width: 1000px) {
     grid-template-areas:
       "form"
