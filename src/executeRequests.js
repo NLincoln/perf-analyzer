@@ -23,15 +23,19 @@ export function executeRequests({ url, samples, headers = {} }) {
       if (isCanceled) {
         return;
       }
-      return run({ url, headers }).then(results => {
-        if (isCanceled) {
-          return;
-        }
-        observer.next({
-          run: index,
-          ...results
+      return run({ url, headers })
+        .then(results => {
+          if (isCanceled) {
+            return;
+          }
+          observer.next({
+            run: index,
+            ...results
+          });
+        })
+        .catch(err => {
+          observer.error(err);
         });
-      });
     }).then(() => {
       observer.complete();
     });

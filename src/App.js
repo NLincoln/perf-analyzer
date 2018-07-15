@@ -19,11 +19,11 @@ const Wrapper = styled.div`
   grid-template-areas:
     "form form raw-results"
     "chart chart raw-results";
-  @media (max-width: 512px) {
+  @media (max-width: 1000px) {
     grid-template-areas:
       "form"
-      "raw-results"
-      "chart";
+      "chart"
+      "raw-results";
   }
 `;
 
@@ -91,6 +91,7 @@ const persistence = {
 class App extends Component {
   state = {
     results: [],
+    error: null,
     state: States.waiting,
     form: persistence.hydrateState()
   };
@@ -132,6 +133,7 @@ class App extends Component {
   pressGo = () => {
     this.setState(prevState => ({
       state: States.warming,
+      error: null,
       results: prevState.results.concat({
         name: this.state.form.name || this.state.form.url,
         resultset: []
@@ -145,6 +147,12 @@ class App extends Component {
       samples: this.state.form.warmups,
       headers: this.getHeaders()
     }).subscribe({
+      error: err => {
+        this.setState({
+          error: err,
+          state: States.waiting
+        });
+      },
       complete: () => {
         this.setState({
           state: States.running
@@ -154,6 +162,12 @@ class App extends Component {
           samples: this.state.form.samples,
           headers: this.getHeaders()
         }).subscribe({
+          error: err => {
+            this.setState({
+              error: err,
+              state: States.waiting
+            });
+          },
           next: result => {
             this.setState(prevState => {
               let prevResults = prevState.results.slice(0, -1);
@@ -161,7 +175,7 @@ class App extends Component {
                 prevState.results[prevState.results.length - 1];
               currentResults = {
                 ...currentResults,
-                resultset: [...currentResults.resultset, result]
+                resultset: [result, ...currentResults.resultset]
               };
               return {
                 results: [...prevResults, currentResults]
@@ -291,6 +305,11 @@ class App extends Component {
                 <CardContent centered>
                   <CircularProgress />
                 </CardContent>
+              </Card>
+            ) : this.state.error ? (
+              <Card>
+                <CardHeader>Error</CardHeader>
+                <CardContent centered>{this.state.error.message}</CardContent>
               </Card>
             ) : (
               <Card>
