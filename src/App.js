@@ -6,9 +6,9 @@ import { FormGroup, FormLabel, FormInput } from "./components/Form";
 import Button from "@material-ui/core/Button";
 import { executeRequests } from "./executeRequests";
 import { CircularProgress } from "@material-ui/core";
-import StatusCode from "./components/StatusCode";
 import HeadersInput from "./HeadersInput";
 import { VictoryChart, VictoryBoxPlot, VictoryTheme } from "victory";
+import { ResultList } from "./components/ResultList";
 
 // https://coolors.co/4a4238-4d5359-508484-79c99e-97db4f
 
@@ -40,14 +40,6 @@ const UrlForm = styled.div`
 
 const GridArea = styled.div`
   grid-area: ${props => props["grid-area"]};
-`;
-
-const ResultList = styled.ul`
-  list-style: none;
-`;
-
-const Result = styled.li`
-  margin: 0;
 `;
 
 const GoButton = styled(Button)`
@@ -299,18 +291,12 @@ class App extends Component {
                 <CardHeader>Raw Results</CardHeader>
                 {this.state.results.length > 0 ? (
                   <CardContent>
-                    <ResultList>
-                      {this.state.results[
-                        this.state.results.length - 1
-                      ].resultset.map(result => {
-                        return (
-                          <Result key={result.run}>
-                            {result.run}: {result.time.toFixed(2)} ms{" "}
-                            <StatusCode response={result.response} />
-                          </Result>
-                        );
-                      })}
-                    </ResultList>
+                    <ResultList
+                      results={
+                        this.state.results[this.state.results.length - 1]
+                          .resultset
+                      }
+                    />
                   </CardContent>
                 ) : (
                   <CardContent centered>
