@@ -5,6 +5,7 @@ import Card, { CardHeader, CardContent } from "./components/Card";
 import { FormGroup, FormLabel, FormInput } from "./components/Form";
 import Button from "@material-ui/core/Button";
 import { executeRequests } from "./executeRequests";
+import { CircularProgress } from "@material-ui/core";
 import StatusCode from "./components/StatusCode";
 import HeadersInput from "./HeadersInput";
 import { VictoryChart, VictoryBoxPlot, VictoryTheme } from "victory";
@@ -286,33 +287,42 @@ class App extends Component {
             </GridArea>
           )}
           <GridArea grid-area={"raw-results"}>
-            <Card>
-              <CardHeader>Raw Results</CardHeader>
-              {this.state.results.length > 0 ? (
-                <CardContent>
-                  <ResultList>
-                    {this.state.results[
-                      this.state.results.length - 1
-                    ].resultset.map(result => {
-                      return (
-                        <Result key={result.run}>
-                          {result.run}: {result.time.toFixed(2)} ms{" "}
-                          <StatusCode response={result.response} />
-                        </Result>
-                      );
-                    })}
-                  </ResultList>
-                </CardContent>
-              ) : (
+            {this.state.state === States.warming ? (
+              <Card>
+                <CardHeader>Warming...</CardHeader>
                 <CardContent centered>
-                  <div style={{ textAlign: "center" }}>
-                    What are you waiting for?
-                    <br />
-                    GO GO GO!
-                  </div>
+                  <CircularProgress />
                 </CardContent>
-              )}
-            </Card>
+              </Card>
+            ) : (
+              <Card>
+                <CardHeader>Raw Results</CardHeader>
+                {this.state.results.length > 0 ? (
+                  <CardContent>
+                    <ResultList>
+                      {this.state.results[
+                        this.state.results.length - 1
+                      ].resultset.map(result => {
+                        return (
+                          <Result key={result.run}>
+                            {result.run}: {result.time.toFixed(2)} ms{" "}
+                            <StatusCode response={result.response} />
+                          </Result>
+                        );
+                      })}
+                    </ResultList>
+                  </CardContent>
+                ) : (
+                  <CardContent centered>
+                    <div style={{ textAlign: "center" }}>
+                      What are you waiting for?
+                      <br />
+                      GO GO GO!
+                    </div>
+                  </CardContent>
+                )}
+              </Card>
+            )}
           </GridArea>
         </Wrapper>
       </Centered>
