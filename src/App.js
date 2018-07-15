@@ -18,12 +18,12 @@ import {
 // https://coolors.co/4a4238-4d5359-508484-79c99e-97db4f
 
 const Wrapper = styled.div`
-  min-width: 50vw;
+  min-width: 80vw;
   display: grid;
   grid-gap: 15px;
   grid-template-areas:
-    "form form"
-    "chart raw-results";
+    "form form raw-results"
+    "chart chart raw-results";
   @media (max-width: 512px) {
     grid-template-areas:
       "form"
@@ -291,10 +291,10 @@ class App extends Component {
               </Card>
             </GridArea>
           )}
-          {this.state.results.length > 0 && (
-            <GridArea grid-area={"raw-results"}>
-              <Card>
-                <CardHeader>Raw Results</CardHeader>
+          <GridArea grid-area={"raw-results"}>
+            <Card>
+              <CardHeader>Raw Results</CardHeader>
+              {this.state.results.length > 0 ? (
                 <CardContent>
                   <ResultList>
                     {this.state.results[
@@ -303,15 +303,23 @@ class App extends Component {
                       return (
                         <Result key={result.run}>
                           {result.run}: {result.time.toFixed(2)} ms{" "}
-                          <StatusCode code={result.response.status} />
+                          <StatusCode response={result.response} />
                         </Result>
                       );
                     })}
                   </ResultList>
                 </CardContent>
-              </Card>
-            </GridArea>
-          )}
+              ) : (
+                <CardContent centered>
+                  <div style={{ textAlign: "center" }}>
+                    What are you waiting for?
+                    <br />
+                    GO GO GO!
+                  </div>
+                </CardContent>
+              )}
+            </Card>
+          </GridArea>
         </Wrapper>
       </Centered>
     );
