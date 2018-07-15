@@ -5,15 +5,9 @@ import Card, { CardHeader, CardContent } from "./components/Card";
 import { FormGroup, FormLabel, FormInput } from "./components/Form";
 import Button from "@material-ui/core/Button";
 import { executeRequests } from "./executeRequests";
-import { CircularProgress } from "@material-ui/core";
 import StatusCode from "./components/StatusCode";
 import HeadersInput from "./HeadersInput";
-import {
-  VictoryChart,
-  VictoryBoxPlot,
-  VictoryTheme,
-  VictoryAxis
-} from "victory";
+import { VictoryChart, VictoryBoxPlot, VictoryTheme } from "victory";
 
 // https://coolors.co/4a4238-4d5359-508484-79c99e-97db4f
 
